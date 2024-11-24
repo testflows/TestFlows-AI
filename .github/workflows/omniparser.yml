@@ -59,7 +59,7 @@ jobs:
           echo "ls"
           ls
           echo "ls OmniParser/weights"
-          ls weights
+          ls OmniParser/weights
           echo "ls OmniParser/repo/weights"
           ls OmniParser/repo/weights
           
