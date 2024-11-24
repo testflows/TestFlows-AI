@@ -9,11 +9,11 @@ on:
         required: false
       omniparser_commit:
         description: "https://github.com/microsoft/OmniParser repo commit"
-        default: a14c401
+        default: a14c4010ebd91aae83a240badadc9e5721aaf0c8
         required: false
       omniparser_weights_commit:
         description: "https://huggingface.co/microsoft/OmniParser model weights commit"
-        default: 7f4732c
+        default: 7652a5ac81645a48fbe69a8f70a6a2b523d25558
         required: false
 jobs:
    build:
