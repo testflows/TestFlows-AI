@@ -5,7 +5,8 @@ on:
     inputs:
       tag:
         description: "Tag"
-        required: true
+        default: latest
+        required: false
       omniparser_commit:
         description: "OmniParser commit hash"
         default: a14c401
