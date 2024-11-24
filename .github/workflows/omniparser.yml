@@ -20,14 +20,21 @@ jobs:
       
       - name: Checkout OmniParser repository
         run: |
-          git clone --depth=1 https://github.com/microsoft/OmniParser.git repo
-          cd repo
+          git clone --depth=1 https://github.com/microsoft/OmniParser.git OmniParser/repo
+          cd OmniParser/repo
           git fetch --depth=1 origin ${{ env.OMNIPARSER_COMMIT }}
           git checkout ${{ env.OMNIPARSER_COMMIT }}
+          cd ..
 
       - name: Install Hugging Face Hub
         run: |
-          ls
-          python --version
           pip install huggingface_hub
-          huggingface-cli --help
+
+      - name: Download weights
+        run: huggingface-cli download microsoft/OmniParser --revision 7f4732c --local-dir repo/weights
+
+      - name: List directory contents
+        run: |
+          ls
+          ls repo/weights
+       
