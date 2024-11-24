@@ -6,8 +6,20 @@ on:
       tag:
         description: "Tag"
         required: true
+      omniparser_commit:
+        description: "OmniParser commit hash"
+        default: a14c401
+        required: false
 jobs:
   build:
     runs-on: [ubuntu-22.04]
     steps:
-      - run: echo "🍏 This job's status is ${{ job.status }}."
+      - name: 🧪 Checkout repository
+        uses: actions/checkout@v4
+      
+      - name: 🧪 Checkout OmniParser repository
+        run: |
+           git clone --depth=1 https://github.com/microsoft/OmniParser.git repo
+           cd repo
+           git fetch --depth=1 origin ${{ env.OMNIPARSER_COMMIT }}
+           git checkout ${{ env.OMNIPARSER_COMMIT }}
