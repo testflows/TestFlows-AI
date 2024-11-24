@@ -27,24 +27,24 @@ jobs:
         uses: actions/cache@v4
         with:
           path: OmniParser/repo
-          key: ${{ runner.os }}-omniparser-repo-${{ env.OMNIPARSER_COMMIT }}
+          key: ${{ runner.os }}-omniparser-repo-${{ inputs.omniparser_commit }}
           restore-keys: |
-            ${{ runner.os }}-omniparser-repo-${{ env.OMNIPARSER_COMMIT }}
+            ${{ runner.os }}-omniparser-repo-${{ inputs.omniparser_commit }}
 
       - name: Cache OmniParser model weights
         uses: actions/cache@v4
         with:
           path: OmniParser/weights
-          key: ${{ runner.os }}-omniparser-model-weights-${{ env.OMNIPARSER_WEIGHTS_COMMIT }}
+          key: ${{ runner.os }}-omniparser-model-weights-${{ inputs.omniparser_weights_commit }}
           restore-keys: |
-            ${{ runner.os }}-omniparser-model-weights-${{ env.OMNIPARSER_WEIGHTS_COMMIT }}
+            ${{ runner.os }}-omniparser-model-weights-${{ inputs.omniparser_weights_commit }}
       
       - name: Checkout OmniParser repository
         run: |
           git clone --depth=1 https://github.com/microsoft/OmniParser.git OmniParser/repo
           cd OmniParser/repo
-          git fetch --depth=1 origin ${{ env.OMNIPARSER_COMMIT }}
-          git checkout ${{ env.OMNIPARSER_COMMIT }}
+          git fetch --depth=1 origin ${{ inputs.omniparser_commit }}
+          git checkout ${{ inputs.omniparser_commit }}
           cd ..
 
       - name: Install Hugging Face Hub
@@ -53,7 +53,7 @@ jobs:
 
       - name: Download weights
         run: |
-          huggingface-cli download microsoft/OmniParser --revision ${{ env.OMNIPARSER_WEIGHTS_COMMIT }} --local-dir weights
+          huggingface-cli download microsoft/OmniParser --revision ${{ inputs.omniparser_weights_commit }} --local-dir weights
 
       - name: List directory contents
         run: |
