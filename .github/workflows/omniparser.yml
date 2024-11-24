@@ -8,15 +8,35 @@ on:
         default: latest
         required: false
       omniparser_commit:
-        description: "OmniParser commit hash"
+        description: "https://github.com/microsoft/OmniParser repo commit"
         default: a14c401
         required: false
+      omniparser_weights_commit:
+        description: "https://huggingface.co/microsoft/OmniParser model weights commit"
+        default: 7f4732c
+        required: false
 jobs:
-  build:
+  Build:
     runs-on: [ubuntu-22.04]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Cache OmniParser repo
+        uses: actions/cache@v4
+        with:
+          path: OmniParser/repo
+          key: ${{ runner.os }}-omniparser-repo-${{ env.OMNIPARSER_COMMIT }}
+          restore-keys: |
+            ${{ runner.os }}-omniparser-repo-${{ env.OMNIPARSER_COMMIT }}
+
+      - name: Cache OmniParser model weights
+        uses: actions/cache@v4
+        with:
+          path: OmniParser/weights
+          key: ${{ runner.os }}-omniparser-model-weights-${{ env.OMNIPARSER_WEIGHTS_COMMIT }}
+          restore-keys: |
+            ${{ runner.os }}-omniparser-model-weights-${{ env.OMNIPARSER_WEIGHTS_COMMIT }}
       
       - name: Checkout OmniParser repository
         run: |
@@ -31,10 +51,16 @@ jobs:
           pip install huggingface_hub
 
       - name: Download weights
-        run: huggingface-cli download microsoft/OmniParser --revision 7f4732c --local-dir repo/weights
+        run: |
+          huggingface-cli download microsoft/OmniParser --revision ${{ env.OMNIPARSER_WEIGHTS_COMMIT }} --local-dir weights
 
       - name: List directory contents
         run: |
+          echo "ls"
           ls
+          echo "ls weights"
+          ls weights
+          echo "ls repo/weights"
           ls repo/weights
+          
        
