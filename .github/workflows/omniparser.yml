@@ -19,11 +19,12 @@ jobs:
    build:
     name: ⚒️ Build
     runs-on: [self-hosted, type-cx32, image-x86-system-ubuntu-22.04]
-    env:
-      PATH: ${{ env.HOME }}/.local/bin:${{ env.PATH }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Set environment variables
+        run: echo "$HOME/.local/bin:$PATH" >> $GITHUB_ENV
 
       - name: Cache OmniParser repo
         id: repo-cache
