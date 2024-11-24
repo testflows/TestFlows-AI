@@ -1,0 +1,13 @@
+name: 🦾 OmniParser docker image
+run-name: ${{ github.actor }} is buiding OmniParser docker image 🚀
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag"
+        required: true
+jobs:
+  build:
+    runs-on: [ubuntu-22.04]
+    steps:
+      - run: echo "🍏 This job's status is ${{ job.status }}."
