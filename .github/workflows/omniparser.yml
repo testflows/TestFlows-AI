@@ -45,7 +45,6 @@ jobs:
           cd OmniParser/repo
           git fetch --depth=1 origin ${{ inputs.omniparser_commit }}
           git checkout ${{ inputs.omniparser_commit }}
-          cd ..
 
       - name: Install Hugging Face Hub
         run: |
@@ -61,7 +60,7 @@ jobs:
           ls
           echo "ls weights"
           ls weights
-          echo "ls repo/weights"
-          ls repo/weights
+          echo "ls OmniParser/repo/weights"
+          ls OmniParser/repo/weights
           
        
