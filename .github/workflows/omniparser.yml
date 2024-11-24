@@ -38,8 +38,37 @@ jobs:
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y git
-          sudo apt-get install -y python3-pip
+          sudo apt-get install -y \
+            git \
+            python3-pip \
+            ca-certificates \
+            curl \
+            gnupg \
+            lsb-release
+
+      - name: Add Docker’s official GPG key
+        run: |
+          sudo mkdir -p /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+      - name: Set up Docker repository
+        run: |
+          echo \
+          "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+          $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+      - name: Install Docker
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+      - name: Verify Docker version
+        run: docker --version
+
+      - name: Add user to Docker group
+        run: |
+          sudo usermod -aG docker $USER
+          newgrp docker
     
       - name: Checkout OmniParser repository if no cache
         if: steps.cache.outputs.cache-hit != 'true'
@@ -65,6 +94,12 @@ jobs:
           cd OmniParser/repo
           python3 weights/convert_safetensor_to_pt.py
           ls weights/*.pt
+
+      - name: Build docker image
+        run: docker build -t testflows/omniparser:${{ inputs.tag }} .
+
+      - name: List docker images
+        run: docker images
 
           
        
