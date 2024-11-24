@@ -18,7 +18,7 @@ on:
 jobs:
    build:
     name: ⚒️ Build
-    runs-on: [ubuntu-22.04]
+    runs-on: [self-hosted, type-cx32m image-x86-system-ubuntu-22.04]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
