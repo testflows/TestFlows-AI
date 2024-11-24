@@ -51,7 +51,9 @@ jobs:
 
       - name: Install Hugging Face Hub
         run: |
-          pip install huggingface_hub
+          apt-get update
+          apt-get install python3-pip
+          pip3 install huggingface_hub
 
       - name: Download weights if no cache
         if: steps.weights-cache.outputs.cache-hit != 'true'
