@@ -24,7 +24,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Set environment variables
-        run: echo "PATH=$HOME/.local/bin:$PATH" >> $GITHUB_ENV
+        run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Cache OmniParser repo
         id: repo-cache
