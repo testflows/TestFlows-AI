@@ -27,22 +27,13 @@ jobs:
         run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Cache OmniParser repo
-        id: repo-cache
+        id: cache
         uses: actions/cache@v4
         with:
           path: OmniParser/repo
-          key: ${{ runner.os }}-omniparser-repo-${{ inputs.omniparser_commit }}
+          key: ${{ runner.os }}-omniparser-repo-${{ inputs.omniparser_commit }}-${{ inputs.omniparser_weights_commit }}
           restore-keys: |
-            ${{ runner.os }}-omniparser-repo-${{ inputs.omniparser_commit }}
-
-      - name: Cache OmniParser model weights
-        id: weights-cache
-        uses: actions/cache@v4
-        with:
-          path: OmniParser/weights
-          key: ${{ runner.os }}-omniparser-model-weights-${{ inputs.omniparser_weights_commit }}
-          restore-keys: |
-            ${{ runner.os }}-omniparser-model-weights-${{ inputs.omniparser_weights_commit }}
+            ${{ runner.os }}-omniparser-repo-${{ inputs.omniparser_commit }}-${{ inputs.omniparser_weights_commit }}
 
       - name: Install system dependencies
         run: |
@@ -51,7 +42,7 @@ jobs:
           sudo apt-get install -y python3-pip
     
       - name: Checkout OmniParser repository if no cache
-        if: steps.repo-cache.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           git clone --depth=1 https://github.com/microsoft/OmniParser.git OmniParser/repo
           cd OmniParser/repo
@@ -63,17 +54,17 @@ jobs:
           pip3 install huggingface_hub
 
       - name: Download weights if no cache
-        if: steps.weights-cache.outputs.cache-hit != 'true'
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          huggingface-cli download microsoft/OmniParser --revision ${{ inputs.omniparser_weights_commit }} --local-dir OmniParser/weights
+          huggingface-cli download microsoft/OmniParser --revision ${{ inputs.omniparser_weights_commit }} --local-dir OmniParser/repo/weights
+          echo "Delete blip2 to reduce space to fit 10GB cache limit"
+          rm -rf OmniParser/repo/weights/icon_caption_blip2
 
-      - name: List directory contents
+      - name: Convert the safetensor weights to .pt file
         run: |
-          echo "ls"
-          ls
-          echo "ls OmniParser/weights"
-          ls OmniParser/weights
-          echo "ls OmniParser/repo/weights"
-          ls OmniParser/repo/weights
+          cd OmniParser/repo
+          python3 weights/convert_safetensor_to_pt.py
+          ls weights/*.pt
+
           
        
