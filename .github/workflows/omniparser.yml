@@ -89,12 +89,6 @@ jobs:
           echo "Delete blip2 to reduce space to fit 10GB cache limit"
           rm -rf OmniParser/repo/weights/icon_caption_blip2
 
-      - name: Convert the safetensor weights to .pt file
-        run: |
-          cd OmniParser/repo
-          python3 weights/convert_safetensor_to_pt.py
-          ls weights/*.pt
-
       - name: Build docker image
         run: docker build -t testflows/omniparser:${{ inputs.tag }} .
 
