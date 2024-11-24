@@ -52,13 +52,13 @@ jobs:
 
       - name: Download weights
         run: |
-          huggingface-cli download microsoft/OmniParser --revision ${{ inputs.omniparser_weights_commit }} --local-dir weights
+          huggingface-cli download microsoft/OmniParser --revision ${{ inputs.omniparser_weights_commit }} --local-dir OmniParser/weights
 
       - name: List directory contents
         run: |
           echo "ls"
           ls
-          echo "ls weights"
+          echo "ls OmniParser/weights"
           ls weights
           echo "ls OmniParser/repo/weights"
           ls OmniParser/repo/weights
