@@ -40,7 +40,13 @@ jobs:
           key: ${{ runner.os }}-omniparser-model-weights-${{ inputs.omniparser_weights_commit }}
           restore-keys: |
             ${{ runner.os }}-omniparser-model-weights-${{ inputs.omniparser_weights_commit }}
-      
+
+      - name: Install system dependencies
+        run: |
+          apt-get update
+          apt-get install -y git
+          apt-get install -y python3-pip
+    
       - name: Checkout OmniParser repository if no cache
         if: steps.repo-cache.outputs.cache-hit != 'true'
         run: |
@@ -51,8 +57,6 @@ jobs:
 
       - name: Install Hugging Face Hub
         run: |
-          apt-get update
-          apt-get install python3-pip
           pip3 install huggingface_hub
 
       - name: Download weights if no cache
