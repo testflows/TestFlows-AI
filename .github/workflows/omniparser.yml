@@ -24,6 +24,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Cache OmniParser repo
+        id: repo-cache
         uses: actions/cache@v4
         with:
           path: OmniParser/repo
@@ -32,6 +33,7 @@ jobs:
             ${{ runner.os }}-omniparser-repo-${{ inputs.omniparser_commit }}
 
       - name: Cache OmniParser model weights
+        id: weights-cache
         uses: actions/cache@v4
         with:
           path: OmniParser/weights
@@ -39,7 +41,8 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-omniparser-model-weights-${{ inputs.omniparser_weights_commit }}
       
-      - name: Checkout OmniParser repository
+      - name: Checkout OmniParser repository if no cache
+        if: steps.repo-cache.outputs.cache-hit != 'true'
         run: |
           git clone --depth=1 https://github.com/microsoft/OmniParser.git OmniParser/repo
           cd OmniParser/repo
@@ -50,7 +53,8 @@ jobs:
         run: |
           pip install huggingface_hub
 
-      - name: Download weights
+      - name: Download weights if no cache
+        if: steps.weights-cache.outputs.cache-hit != 'true'
         run: |
           huggingface-cli download microsoft/OmniParser --revision ${{ inputs.omniparser_weights_commit }} --local-dir OmniParser/weights
 
