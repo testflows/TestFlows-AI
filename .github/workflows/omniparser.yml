@@ -92,6 +92,8 @@ jobs:
       - name: Build docker image
         run: |
           cd OmniParser
+          echo "Debug sleep...."
+          sleep 6000
           docker build -t testflows/omniparser:${{ inputs.tag }} .
 
       - name: List docker images
