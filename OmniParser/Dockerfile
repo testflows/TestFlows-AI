@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y \
     python3 python3-pip
 
 # Install python dependencies
-RUN pip3 install -r omniparser/requirements.txt
+RUN pip3 install -r requirements.txt
 
 # Convert the safetensor to .pt file.
 RUN python3 weights/convert_safetensor_to_pt.py
