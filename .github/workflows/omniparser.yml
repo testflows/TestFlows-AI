@@ -39,9 +39,7 @@ jobs:
         run: |
           sudo mkdir -p /lower /upper /work /overlay-cache /merged
           sudo mount -t overlay -o lowerdir=/,upperdir=/upper,workdir=/work overlay /merged
-
-      - name: Bind Mount `/dev`
-        run: sudo mount --bind /dev /merged/dev
+          sudo mount --bind /dev /merged/dev
 
       - name: Use Cached OverlayFS Changes
         if: steps.cache.outputs.cache-hit == 'true'
