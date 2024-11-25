@@ -48,7 +48,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo chroot /merged bash -c '
-          sudo apt-get update
+          sudo apt-get update &&
           sudo apt-get install -y \
             git \
             python3-pip \
@@ -61,7 +61,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo chroot /merged /bin/bash -c '
-          mkdir -p /etc/apt/keyrings
+          mkdir -p /etc/apt/keyrings &&
           curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg'
 
       - name: Set up Docker repository
@@ -76,7 +76,7 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo chroot /merged /bin/bash -c '
-          sudo apt-get update
+          sudo apt-get update &&
           sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin'
 
       - name: Verify Docker version
@@ -92,9 +92,9 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo chroot /merged /bin/bash -c '
-          git clone --depth=1 https://github.com/microsoft/OmniParser.git OmniParser/repo
-          cd OmniParser/repo
-          git fetch --depth=1 origin ${{ inputs.omniparser_commit }}
+          git clone --depth=1 https://github.com/microsoft/OmniParser.git OmniParser/repo &&
+          cd OmniParser/repo &&
+          git fetch --depth=1 origin ${{ inputs.omniparser_commit }} &&
           git checkout ${{ inputs.omniparser_commit }}'
 
       - name: Install Hugging Face Hub
@@ -107,8 +107,8 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo chroot /merged /bin/bash -c '
-          huggingface-cli download microsoft/OmniParser --revision ${{ inputs.omniparser_weights_commit }} --local-dir OmniParser/repo/weights
-          echo "Delete blip2 to reduce space to fit 10GB cache limit"
+          huggingface-cli download microsoft/OmniParser --revision ${{ inputs.omniparser_weights_commit }} --local-dir OmniParser/repo/weights &&
+          echo "Delete blip2 to reduce space to fit 10GB cache limit" &&
           rm -rf OmniParser/repo/weights/icon_caption_blip2'
 
       - name: Build docker image
