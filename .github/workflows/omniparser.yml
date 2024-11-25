@@ -95,5 +95,12 @@ jobs:
       - name: List docker images
         run: docker images
 
+      - name: Log in to Docker Hub
+        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login --username "testflows" --password-stdin
+
+      - name: Push Docker image
+        run: docker push testflows/omniparser:latest
+
+
           
        
