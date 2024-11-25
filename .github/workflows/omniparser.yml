@@ -47,6 +47,7 @@ jobs:
       - name: Install system dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
+          sudo chroot /merged bash -c '
           sudo apt-get update
           sudo apt-get install -y \
             git \
@@ -54,26 +55,29 @@ jobs:
             ca-certificates \
             curl \
             gnupg \
-            lsb-release
+            lsb-release'
 
       - name: Add Docker’s official GPG key
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          sudo mkdir -p /etc/apt/keyrings
-          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+          sudo chroot /merged /bin/bash -c '
+          mkdir -p /etc/apt/keyrings
+          curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg'
 
       - name: Set up Docker repository
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
+          sudo chroot /merged /bin/bash -c '
           echo \
           "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-          $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null'
 
       - name: Install Docker
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
+          sudo chroot /merged /bin/bash -c '
           sudo apt-get update
-          sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin'
 
       - name: Verify Docker version
         run: docker --version
@@ -87,22 +91,25 @@ jobs:
       - name: Checkout OmniParser repository if no cache
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
+          sudo chroot /merged /bin/bash -c '
           git clone --depth=1 https://github.com/microsoft/OmniParser.git OmniParser/repo
           cd OmniParser/repo
           git fetch --depth=1 origin ${{ inputs.omniparser_commit }}
-          git checkout ${{ inputs.omniparser_commit }}
+          git checkout ${{ inputs.omniparser_commit }}'
 
       - name: Install Hugging Face Hub
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          pip3 install huggingface_hub
+          sudo chroot /merged /bin/bash -c '
+          pip3 install huggingface_hub'
 
       - name: Download weights if no cache
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
+          sudo chroot /merged /bin/bash -c '
           huggingface-cli download microsoft/OmniParser --revision ${{ inputs.omniparser_weights_commit }} --local-dir OmniParser/repo/weights
           echo "Delete blip2 to reduce space to fit 10GB cache limit"
-          rm -rf OmniParser/repo/weights/icon_caption_blip2
+          rm -rf OmniParser/repo/weights/icon_caption_blip2'
 
       - name: Build docker image
         run: |
