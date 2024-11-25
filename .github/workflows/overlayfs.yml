@@ -40,7 +40,7 @@ jobs:
           apt-get install -y python3-pip'
       
       - name: Verify Installation
-        run: docker --version
+        run: pip3 --version
 
       - name: Save OverlayFS Changes
         run: |
