@@ -4,6 +4,8 @@ WORKDIR /omniparser
 
 # Copy repo into working directory
 COPY repo /omniparser
+COPY demo.png .
+COPY demo.py .
 
 # Install dependencies
 RUN apt-get update && apt-get install -y \
