@@ -15,9 +15,9 @@ jobs:
         uses: actions/cache@v3
         with:
           path: /overlay-cache
-          key: ${{ runner.os }}-overlay-cache
+          key: ${{ runner.os }}-overlay-cache-1
           restore-keys: |
-            ${{ runner.os }}-overlay-cache
+            ${{ runner.os }}-overlay-cache-1
 
       - name: Prepare OverlayFS
         run: |
@@ -39,10 +39,15 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo chroot /merged bash -c '
-          touch /test-file'
+          touch /test-file
+          apt-get update
+          apt-get install -y python3-pip
+          '
       
       - name: Verify Installation
-        run: ls -l /upper
+        run: | 
+          ls -l /upper
+          pip3 --version
 
       - name: Save OverlayFS Changes
         run: |
