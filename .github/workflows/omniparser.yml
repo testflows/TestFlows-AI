@@ -26,16 +26,26 @@ jobs:
       - name: Set environment variables
         run: echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
-      - name: Cache OmniParser repo
+      - name: Set up cache for OverlayFS
         id: cache
-        uses: actions/cache@v4
+        uses: actions/cache@v3
         with:
-          path: OmniParser/repo
-          key: ${{ runner.os }}-omniparser-repo-${{ inputs.omniparser_commit }}-${{ inputs.omniparser_weights_commit }}
+          path: /overlay-cache
+          key: ${{ runner.os }}-overlay-cache-${{ inputs.omniparser_commit }}-${{ inputs.omniparser_weights_commit }}
           restore-keys: |
             ${{ runner.os }}-omniparser-repo-${{ inputs.omniparser_commit }}-${{ inputs.omniparser_weights_commit }}
 
+      - name: Prepare OverlayFS
+        run: |
+          sudo mkdir -p /lower /upper /work /overlay-cache /merged
+          sudo mount -t overlay -o lowerdir=/,upperdir=/upper,workdir=/work overlay /merged
+
+      - name: Use Cached OverlayFS Changes
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: sudo rsync -a /overlay-cache/ /upper/
+
       - name: Install system dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -47,17 +57,20 @@ jobs:
             lsb-release
 
       - name: Add Docker’s official GPG key
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo mkdir -p /etc/apt/keyrings
           curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
 
       - name: Set up Docker repository
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           echo \
           "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
           $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
 
       - name: Install Docker
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo apt-get update
           sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
@@ -66,6 +79,7 @@ jobs:
         run: docker --version
 
       - name: Add user to Docker group
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo usermod -aG docker $USER
           newgrp docker
@@ -79,6 +93,7 @@ jobs:
           git checkout ${{ inputs.omniparser_commit }}
 
       - name: Install Hugging Face Hub
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
           pip3 install huggingface_hub
 
@@ -92,8 +107,6 @@ jobs:
       - name: Build docker image
         run: |
           cd OmniParser
-          echo "Debug sleep...."
-          sleep 6000
           docker build -t testflows/omniparser:${{ inputs.tag }} .
 
       - name: List docker images
@@ -104,6 +117,9 @@ jobs:
 
       - name: Push Docker image
         run: docker push testflows/omniparser:${{ inputs.tag }}
+
+      - name: Save OverlayFS Changes
+        run: sudo cp -r /upper/* /overlay-cache
 
 
           
