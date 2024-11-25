@@ -89,17 +89,17 @@ jobs:
           echo "Delete blip2 to reduce space to fit 10GB cache limit"
           rm -rf OmniParser/repo/weights/icon_caption_blip2
 
-      - name: Build docker image
-        run: docker build -t testflows/omniparser:${{ inputs.tag }} OmniParser/Dockerfile
+      #- name: Build docker image
+      #  run: docker build -t testflows/omniparser:${{ inputs.tag }} OmniParser/Dockerfile
 
-      - name: List docker images
-        run: docker images
+      #- name: List docker images
+      #  run: docker images
 
-      - name: Log in to Docker Hub
-        run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login --username "testflows" --password-stdin
+      #- name: Log in to Docker Hub
+      #  run: echo "${{ secrets.DOCKER_HUB_TOKEN }}" | docker login --username "testflows" --password-stdin
 
-      - name: Push Docker image
-        run: docker push testflows/omniparser:latest
+      #- name: Push Docker image
+      #  run: docker push testflows/omniparser:latest
 
 
           
