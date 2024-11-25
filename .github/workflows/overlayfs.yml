@@ -20,6 +20,7 @@ jobs:
         run: |
           sudo mkdir -p /lower /upper /work /overlay-cache /merged
           sudo mount -t overlay -o lowerdir=/,upperdir=/upper,workdir=/work overlay /merged
+          sudo cp -L /etc/resolv.conf /merged/etc/resolv.conf
           sudo mount --bind /proc /merged/proc
           sudo mount --bind /sys /merged/sys
           sudo mount --bind /dev /merged/dev
