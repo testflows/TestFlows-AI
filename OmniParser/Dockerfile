@@ -2,7 +2,7 @@ FROM ubuntu:22.04
 
 WORKDIR /omniparser
 
-# Copy repo into working directory
+# Copy repo and demo files into working directory
 COPY repo /omniparser
 COPY demo.png .
 COPY demo.py .
