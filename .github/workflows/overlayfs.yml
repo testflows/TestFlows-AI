@@ -36,11 +36,10 @@ jobs:
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
           sudo chroot /merged bash -c '
-          apt-get update &&
-          apt-get install -y python3-pip'
+          touch /test-file'
       
       - name: Verify Installation
-        run: pip3 --version
+        run: ls -l /upper
 
       - name: Save OverlayFS Changes
         run: |
