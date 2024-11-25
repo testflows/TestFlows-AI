@@ -90,7 +90,7 @@ jobs:
           rm -rf OmniParser/repo/weights/icon_caption_blip2
 
       - name: Build docker image
-        run: docker build -t testflows/omniparser:${{ inputs.tag }} .
+        run: docker build -t testflows/omniparser:${{ inputs.tag }} OmniParser/Dockerfile
 
       - name: List docker images
         run: docker images
