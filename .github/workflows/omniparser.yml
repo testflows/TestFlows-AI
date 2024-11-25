@@ -44,6 +44,11 @@ jobs:
         if: steps.cache.outputs.cache-hit == 'true'
         run: sudo rsync -a /overlay-cache/ /upper/
 
+      - name: Remove mirror.hetzner.com mirror
+        run: |
+           sudo grep -rl "mirror.hetzner.com" /etc/apt/ | xargs sudo sed -i '/mirror.hetzner.com/d'
+           sudo apt-get update
+
       - name: Install system dependencies
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
