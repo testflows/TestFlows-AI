@@ -1,0 +1,46 @@
+name: 🦾 Test OverlayFS caching
+run-name: ${{ github.actor }} is testing OverlayFS caching 🚀
+on:
+  workflow_dispatch:
+jobs:
+   build:
+    name: ⚒️ Test
+    runs-on: [self-hosted, type-cx32, image-x86-system-ubuntu-22.04]
+    steps:
+      - name: Set up cache for OverlayFS
+        id: cache
+        uses: actions/cache@v3
+        with:
+          path: /overlay-cache
+          key: ${{ runner.os }}-overlay-cache
+          restore-keys: |
+            ${{ runner.os }}-overlay-cache
+
+      - name: Prepare OverlayFS
+        run: |
+          sudo mkdir -p /lower /upper /work /overlay-cache /merged
+          sudo mount -t overlay -o lowerdir=/,upperdir=/upper,workdir=/work overlay /merged
+          sudo mount --bind /proc /merged/proc
+          sudo mount --bind /sys /merged/sys
+          sudo mount --bind /dev /merged/dev
+
+      - name: Use Cached OverlayFS Changes
+        if: steps.cache.outputs.cache-hit == 'true'
+        run: |
+          if [ -d /overlay-cache ]; then
+            sudo rsync -a /overlay-cache/ /upper/
+          fi
+
+      - name: Install System Dependencies
+        if: steps.cache.outputs.cache-hit != 'true'
+        run: |
+          sudo chroot /merged bash -c '
+          apt-get update &&
+          apt-get install -y python3-pip'
+      
+      - name: Verify Installation
+        run: docker --version
+
+      - name: Save OverlayFS Changes
+        run: |
+          sudo cp -r /upper/* /overlay-cache
