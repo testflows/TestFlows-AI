@@ -35,6 +35,15 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-omniparser-repo-${{ inputs.omniparser_commit }}-${{ inputs.omniparser_weights_commit }}
 
+      - name: Cache docker build layers
+        id: docker-build-cache
+        uses: actions/cache@v3
+        with:
+          path: /tmp/docker-build-cache
+          key: ${{ runner.os }}-docker-build-cache
+          restore-keys: |
+            ${{ runner.os }}-docker-build-cache
+
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -92,7 +101,8 @@ jobs:
       - name: Build docker image
         run: |
           cd OmniParser
-          docker build -t testflows/omniparser:${{ inputs.tag }} .
+          mkdir -p /tmp/docker-build-cache
+          docker build --cache-from /tmp/docker-build-cache -t testflows/omniparser:${{ inputs.tag }} .
 
       - name: List docker images
         run: docker images
